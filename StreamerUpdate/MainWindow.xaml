@@ -1,0 +1,87 @@
+﻿<mah:MetroWindow
+    x:Class="StreamerUpdate.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:appContainer="clr-namespace:StreamerUpdate.AppContainer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:StreamerUpdate"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    Closing="MainWindow_OnClosing"
+    mc:Ignorable="d">
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Button
+            x:Name="ClickMeButton"
+            Click="ClickMeClick"
+            Command="{Binding ClickMeCommand}"
+            Content="Click me"
+            Style="{StaticResource MahApps.Styles.Button.Square.Accent}" />
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            BorderBrush="Black"
+            BorderThickness="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Source="{Binding CapturedImage}"
+                    Stretch="Fill" />
+                <Grid
+                    Grid.Column="0"
+                    Background="Black"
+                    Visibility="{Binding CameraBad, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <iconPacks:PackIconMaterial
+                        Width="60"
+                        Height="60"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Foreground="Red"
+                        Kind="Close" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Text="No Camera Connected" />
+                </Grid>
+                <Grid Grid.Column="0" Visibility="{Binding CameraGood, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <iconPacks:PackIconMaterial
+                        Width="60"
+                        Height="60"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Foreground="Green"
+                        Kind="Check" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Text="Camera OK!" />
+                </Grid>
+            </Grid>
+        </Border>
+        <appContainer:AppControl
+            x:Name="_appControl"
+            Grid.Row="1"
+            Grid.Column="1" />
+    </Grid>
+</mah:MetroWindow>
