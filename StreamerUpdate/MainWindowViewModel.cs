@@ -42,41 +42,46 @@ namespace StreamerUpdate
         {
           continue;
         }
-
+        _timerDisposable?.Dispose();
         _deviceIdx = index;
         CapturedImage = img;
-        _timerDisposable?.Dispose();
         CameraGood = true;
         CameraBad = false;
         StartFastCapture();
         return;
       }
-
       CameraGood = false;
       CameraBad = true;
     }
 
     private void StartFastCapture()
     {
-      _fastCaptureDisposable = Observable.Interval(TimeSpan.FromMilliseconds(500)).SubscribeOn(RxApp.MainThreadScheduler).ObserveOn(RxApp.MainThreadScheduler).Subscribe(
+      bool busy = false;
+      _fastCaptureDisposable = Observable.Interval(TimeSpan.FromMilliseconds(500)).Subscribe(
         t =>
         {
+          if (busy)
+            return;
+          busy = true;
           var imag = _captureDevice.Capture(_deviceIdx);
           if (imag == null)
           {
             CameraGood = false;
             CameraBad = true;
-            _fastCaptureDisposable.Dispose();
             StartInterval();
+            _fastCaptureDisposable.Dispose();
+            busy = false;
             return;
           }
+
           CapturedImage = imag;
+          busy = false;
         });
     }
 
     private void StartInterval()
     {
-      _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).SubscribeOn(RxApp.MainThreadScheduler).ObserveOn(RxApp.MainThreadScheduler).Subscribe(t => ConnectDevice());
+      _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(t => ConnectDevice());
     }
 
     [Reactive]
