@@ -12,6 +12,9 @@
 
     <ItemGroup>
         <None Remove="Resources\Lutherrose.png" />
+        <None Update="Resources\client_secrets.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -35,12 +38,6 @@
 
     <ItemGroup>
       <Folder Include="API" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Resources\client_secrets.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>

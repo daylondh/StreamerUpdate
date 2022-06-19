@@ -1,4 +1,6 @@
-﻿using Ninject;
+﻿using System;
+using System.Diagnostics;
+using Ninject;
 using StreamerUpdate.API;
 
 namespace StreamerUpdate
@@ -15,12 +17,17 @@ namespace StreamerUpdate
       ConfigureContainer();
       ComposeObjects();
       Current.MainWindow.Show();
+     
+      YoutubeHandler handler = new YoutubeHandler();
+      handler.authenticate().ContinueWith(task =>
+      {
+        handler.listBroadcasts();
+      });
     }
 
     private void ConfigureContainer()
     {
       this.container = new StandardKernel(new MainModule());
-      container.Get<Youtube>();
     }
 
     private void ComposeObjects()
