@@ -10,6 +10,7 @@ namespace StreamerUpdate
 {
   public class MainWindowViewModel : ReactiveObject
   {
+    private readonly Calendar _calendar;
     private AppControl _appControlItem;
     private int _deviceIdx = -1;
     private IDisposable _timerDisposable;
@@ -18,14 +19,19 @@ namespace StreamerUpdate
     private IDisposable _fastCaptureDisposable;
     public AudioInputMonitor InputMonitor { get; }
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(Calendar calendar, CalendarBuilder calendarBuilder)
     {
+      _calendar = calendar;
       StartStreamingCommand = ReactiveCommand.Create(DoSomething);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
+      var dt = DateTime.Now;
+      calendarBuilder.Build(dt.Year);
+      calendar.Print();
       ConnectDevice();
       if (CameraBad)
         StartInterval();
+      ServiceName = calendar.GetName(dt.Month, dt.Day);
     }
 
     private void ConnectDevice()
@@ -111,5 +117,8 @@ namespace StreamerUpdate
       get => _capturedImage;
       set => this.RaiseAndSetIfChanged(ref _capturedImage, value);
     }
+
+    [Reactive]
+    public string ServiceName { get; set; }
   }
 }

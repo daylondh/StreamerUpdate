@@ -14,6 +14,7 @@ namespace StreamerUpdate
 
       Bind<Calendar>().ToSelf().InSingletonScope();
       Bind<CalendarBuilder>().ToSelf().InSingletonScope();
+      Bind<MainWindowViewModel>().ToSelf().InSingletonScope();
     }
   }
 }

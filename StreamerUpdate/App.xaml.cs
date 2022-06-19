@@ -21,14 +21,13 @@ namespace StreamerUpdate
     {
       this.container = new StandardKernel(new MainModule());
       container.Get<Youtube>();
-      var builder = container.Get<CalendarBuilder>();
-      builder.Build(2022);
-      container.Get<Calendar>().Print();
     }
 
     private void ComposeObjects()
     {
-      Current.MainWindow = this.container.Get<MainWindow>();
+      var mw = this.container.Get<MainWindow>();
+      mw.DataContext = container.Get<MainWindowViewModel>();
+      Current.MainWindow = mw;
     }
   }
 }

@@ -12,11 +12,9 @@
   Width="800"
   Height="450"
   Closing="MainWindow_OnClosing"
+  Loaded="MainWindow_OnLoaded"
   WindowState="Maximized"
   mc:Ignorable="d">
-  <Window.DataContext>
-    <local:MainWindowViewModel />
-  </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -28,10 +26,17 @@
     </Grid.ColumnDefinitions>
     <Button
       x:Name="StartStreamingButton"
+      Height="40"
+      Margin="5"
       Click="StartStreamingClick"
       Command="{Binding StartStreamingCommand}"
       Content="Start Streaming"
       Style="{StaticResource MahApps.Styles.Button.Square.Accent}" />
+    <TextBox
+      Grid.Column="1"
+      Height="20"
+      VerticalAlignment="Center"
+      Text="{Binding ServiceName}" />
     <Border
       Grid.Row="1"
       Grid.ColumnSpan="2"

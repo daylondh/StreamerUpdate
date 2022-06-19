@@ -11,8 +11,7 @@ namespace StreamerUpdate
     public MainWindow()
     {
       InitializeComponent();
-      (DataContext as MainWindowViewModel).AppControlItem = _appControl;
-      this.Unloaded += (s, e) => { _appControl.Dispose(); };
+     
     }
 
     private void StartStreamingClick(object sender, RoutedEventArgs e)
@@ -23,6 +22,12 @@ namespace StreamerUpdate
     private void MainWindow_OnClosing(object sender, CancelEventArgs e)
     {
       _appControl.Cleanup();
+    }
+
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+      (DataContext as MainWindowViewModel).AppControlItem = _appControl;
+      this.Unloaded += (s, e) => { _appControl.Dispose(); };
     }
   }
 }
