@@ -16,11 +16,13 @@ namespace StreamerUpdate
     private BitmapImage _capturedImage;
     private CaptureDevice _captureDevice;
     private IDisposable _fastCaptureDisposable;
+    public AudioInputMonitor InputMonitor { get; }
 
     public MainWindowViewModel()
     {
       StartStreamingCommand = ReactiveCommand.Create(DoSomething);
       _captureDevice = new CaptureDevice();
+      InputMonitor = new AudioInputMonitor();
       ConnectDevice();
       if (CameraBad)
         StartInterval();
