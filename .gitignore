@@ -1,3 +1,4 @@
 .vs/**
 StreamerUpdate/bin/**
 StreamerUpdate/obj/**
+StreamerUpdate/Resources/client_secrets.json
