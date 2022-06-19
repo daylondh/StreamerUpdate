@@ -1,4 +1,5 @@
-﻿using Ninject.Modules;
+﻿using System.Net.Http;
+using Ninject.Modules;
 
 namespace StreamerUpdate
 {
@@ -6,7 +7,7 @@ namespace StreamerUpdate
   {
     public override void Load()
     {
-
+      Bind<HttpClient>().ToSelf().InSingletonScope();
     }
   }
 }
