@@ -6,7 +6,6 @@ namespace StreamerUpdate
   {
     public override void Load()
     {
-
     }
   }
 }
