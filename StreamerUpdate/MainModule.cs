@@ -11,6 +11,9 @@ namespace StreamerUpdate
       Bind<HttpClient>().ToSelf().InSingletonScope();
       Bind<YTPoster>().ToSelf().InSingletonScope();
       Bind<Youtube>().ToSelf().InSingletonScope();
+
+      Bind<Calendar>().ToSelf().InSingletonScope();
+      Bind<CalendarBuilder>().ToSelf().InSingletonScope();
     }
   }
 }
