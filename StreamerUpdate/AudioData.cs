@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using NAudio.Wave;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace StreamerUpdate
@@ -9,5 +10,7 @@ namespace StreamerUpdate
     public int Value { get; set; }
     [Reactive]
     public string Name { get; set; }
+
+    public WaveInEvent WavIn { get; set; }
   }
 }

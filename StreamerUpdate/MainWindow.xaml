@@ -34,10 +34,11 @@
       Style="{StaticResource MahApps.Styles.Button.Square.Accent}" />
     <Border
       Grid.Row="1"
-      Grid.Column="1"
+      Grid.ColumnSpan="2"
+      Margin="5"
       BorderBrush="Black"
       BorderThickness="2">
-      <Grid Margin="5">
+      <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition />
           <ColumnDefinition />
@@ -49,6 +50,7 @@
           Stretch="Fill" />
         <Grid
           Grid.Column="0"
+          Margin="5"
           Background="Black"
           Visibility="{Binding CameraBad, Converter={StaticResource BooleanToVisibilityConverter}}">
           <iconPacks:PackIconMaterial
@@ -87,8 +89,9 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                   </Grid.ColumnDefinitions>
-                  <TextBlock Text="{Binding Name}"  Margin="5"/>
-                  <ProgressBar Grid.Column="1"
+                  <TextBlock Margin="5" Text="{Binding Name}" />
+                  <ProgressBar
+                    Grid.Column="1"
                     Height="20"
                     Maximum="100"
                     Minimum="0"
