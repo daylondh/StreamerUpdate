@@ -1,17 +1,15 @@
 ﻿namespace StreamerUpdate.API
 {
-    public class Youtube : StreamProvider
+  public class Youtube : StreamProvider
+  {
+    private readonly YTPoster _poster;
+
+    public Youtube(YTPoster poster)
     {
-        private YTPoster poster;
-
-        public Youtube()
-        {
-            this.poster = new YTPoster();
-
-        }
-
-        public void listBroadcasts()
-        {
-        }
+      _poster = poster;
     }
+    public void listBroadcasts()
+    {
+    }
+  }
 }
