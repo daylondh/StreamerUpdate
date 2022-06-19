@@ -4,6 +4,5 @@
     {
         private string id;
         public bool isBound;
-        
     }
 }

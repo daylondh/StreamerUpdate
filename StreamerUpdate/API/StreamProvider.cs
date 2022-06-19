@@ -6,7 +6,6 @@
 
         protected static void authenticate()
         {
-            
         }
     }
 }

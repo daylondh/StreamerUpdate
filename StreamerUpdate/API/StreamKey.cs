@@ -2,7 +2,7 @@
 {
     public class StreamKey
     {
-        public string name;
         public string id;
+        public string name;
     }
 }
