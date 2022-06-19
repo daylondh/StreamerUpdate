@@ -1,18 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace StreamerUpdate.API
 {
     // A lot of these can probably be abstracted into a Poster class which can then be used for other use cases (Twitch, Facebook, etc.) 
     public class YTPoster
     {
+
+        
         private const string BASE_URL = "https://youtube.googleapis.com/youtube";
         private const string VERSION = "v3";
         private const string URL = BASE_URL + "/" + VERSION;
         private string API_KEY = "";
+        private HttpClient client;
 
-        public YTPoster(string apiKey)
+        public YTPoster(string apiKey, HttpClient client)
         {
+            this.client = client;
             this.API_KEY = apiKey;
         }
 
@@ -30,13 +35,12 @@ namespace StreamerUpdate.API
         /// </summary>
         /// <param name="method">The method you'd like to execute. HINT: to use nested methods, use 'topmethodname/lowermethodname'</param>
         /// <param name="parameters">Parameters.</param>
-        public void rawExecute(string method, Dictionary<string, string> parameters)
+        public Task<HttpResponseMessage> rawExecute(string method, Dictionary<string, string> parameters)
         {
             string post = URL + "/" + method;
             var content = new FormUrlEncodedContent(parameters);
-            
+            return client.PostAsync(post, content);
         }
-
 
     }
 }
