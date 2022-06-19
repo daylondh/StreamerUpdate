@@ -1,4 +1,5 @@
 ﻿using Ninject;
+using StreamerUpdate.API;
 
 namespace StreamerUpdate
 {
@@ -19,6 +20,7 @@ namespace StreamerUpdate
     private void ConfigureContainer()
     {
       this.container = new StandardKernel(new MainModule());
+      container.Get<Youtube>();
     }
 
     private void ComposeObjects()
