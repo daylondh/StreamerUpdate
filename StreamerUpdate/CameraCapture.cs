@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 
 namespace StreamerUpdate
@@ -15,7 +16,7 @@ namespace StreamerUpdate
     public List<DsDevice> GetDevices()
     {
       var videoDevices = new List<DsDevice>(DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice));
-      return videoDevices;
+      return videoDevices.Where(d => !d.Name.Equals("OBS Virtual Camera")).ToList();
     }
 
     public BitmapImage Capture(int index)

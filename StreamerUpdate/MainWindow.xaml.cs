@@ -15,9 +15,9 @@ namespace StreamerUpdate
       this.Unloaded += (s, e) => { _appControl.Dispose(); };
     }
 
-    private void ClickMeClick(object sender, RoutedEventArgs e)
+    private void StartStreamingClick(object sender, RoutedEventArgs e)
     {
-      ClickMeButton.IsEnabled = false;
+      StartStreamingButton.IsEnabled = false;
     }
 
     private void MainWindow_OnClosing(object sender, CancelEventArgs e)

@@ -19,7 +19,7 @@ namespace StreamerUpdate
 
     public MainWindowViewModel()
     {
-      ClickMeCommand = ReactiveCommand.Create(DoSomething);
+      StartStreamingCommand = ReactiveCommand.Create(DoSomething);
       _captureDevice = new CaptureDevice();
       ConnectDevice();
       if (CameraBad)
@@ -96,7 +96,7 @@ namespace StreamerUpdate
       AppControlItem.Go();
     }
 
-    public ICommand ClickMeCommand { get; set; }
+    public ICommand StartStreamingCommand { get; set; }
 
     public AppControl AppControlItem
     {
