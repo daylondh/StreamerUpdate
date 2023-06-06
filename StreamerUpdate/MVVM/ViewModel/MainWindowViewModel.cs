@@ -2,9 +2,13 @@
 using ReactiveUI.Fody.Helpers;
 using StreamerUpdate.AppContainer;
 using System;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using DynamicData.Binding;
+using StreamerUpdate.Camera;
+using StreamerUpdate.MVVM.Model;
 
 namespace StreamerUpdate
 {
@@ -19,24 +23,29 @@ namespace StreamerUpdate
     private IDisposable _fastCaptureDisposable;
     public AudioInputMonitor InputMonitor { get; }
 
-    public MainWindowViewModel(Calendar calendar, CalendarBuilder calendarBuilder)
+    public MainWindowViewModel(MainWindowModel model)
     {
-      _calendar = calendar;
-      StartStreamingCommand = ReactiveCommand.Create(DoSomething);
+      Model = model;
+     
+      StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
-      var dt = DateTime.Now;
-      calendarBuilder.Build(dt.Year);
-      calendar.Print();
-      ConnectDevice();
+   
+      InitModelListeners();
+      ConnectDevice(); // Culprit
       if (CameraBad)
         StartInterval();
-      ServiceName = calendar.GetName(dt.Month, dt.Day);
+    }
+
+    private void InitModelListeners()
+    {
+      Model.WhenPropertyChanged(model => model.ServiceName).Subscribe((t) => ServiceName = t.Value);
     }
 
     private void ConnectDevice()
     {
       var devices = _captureDevice.GetDevices();
+
       if (devices.Count == 0)
       {
         CameraGood = false;
@@ -91,18 +100,18 @@ namespace StreamerUpdate
     {
       _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(t => ConnectDevice());
     }
-
+    
+    private void OpenOBS()
+    {
+      AppControlItem.ExeName = @"C:\Program Files\obs-studio\bin\64bit\obs64.exe";
+      AppControlItem.Go();
+    }
+    
     [Reactive]
     public bool CameraBad { get; set; }
 
     [Reactive]
     public bool CameraGood { get; set; }
-
-    private void DoSomething()
-    {
-      AppControlItem.ExeName = @"C:\Program Files\obs-studio\bin\64bit\obs64.exe";
-      AppControlItem.Go();
-    }
 
     public ICommand StartStreamingCommand { get; set; }
 
@@ -120,5 +129,8 @@ namespace StreamerUpdate
 
     [Reactive]
     public string ServiceName { get; set; }
+    
+    
+    private MainWindowModel Model { get; set; }
   }
 }

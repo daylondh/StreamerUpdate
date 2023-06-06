@@ -43,4 +43,10 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Page Update="MVVM\View\MainWindow.xaml">
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+
 </Project>
