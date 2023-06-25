@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -51,6 +52,28 @@ namespace StreamerUpdate.API
         {
             var broadcasts = GetPendingBroadcasts();
             foreach (var broadcast in broadcasts) YoutubeService.LiveBroadcasts.Delete(broadcast.Id).Execute();
+        }
+
+        public ChurchStream MakeStream(string title)
+        {
+            var cs = new ChurchStream(title);
+            var broadcast = new LiveBroadcast
+            {
+                Kind = "youtube#liveBroadcast",
+                Snippet = new LiveBroadcastSnippet
+                {
+                    Title = title,
+                    ScheduledStartTime = DateTime.Now,
+                    ScheduledEndTime = DateTime.Now.AddHours(2)
+                },
+                Status = new LiveBroadcastStatus {PrivacyStatus = "public"}
+            };
+            var insertRequest = YoutubeService.LiveBroadcasts.Insert(broadcast, "id,snippet,status");
+            var response = insertRequest.Execute();
+            cs.Broadcast = response;
+            YoutubeService.LiveBroadcasts.Bind(response.Id, "id,snippet,contentDetails,status").Execute();
+            return cs;
+
         }
     }
 }
