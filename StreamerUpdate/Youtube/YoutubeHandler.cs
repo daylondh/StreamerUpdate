@@ -45,12 +45,7 @@ namespace StreamerUpdate.API
 
     public void listBroadcasts()
     { 
-      var listRequest = service.LiveBroadcasts.List("snippet,contentDetails,status");
-      listRequest.BroadcastType = LiveBroadcastsResource.ListRequest.BroadcastTypeEnum.All;
-      listRequest.Mine = true;
-      var response = listRequest.Execute();
-      var t = response.Items[0].Snippet.Title;
-      Console.Write(t);
+
 
     }
   }
