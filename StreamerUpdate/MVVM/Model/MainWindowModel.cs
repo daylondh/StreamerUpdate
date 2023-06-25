@@ -38,14 +38,7 @@ namespace StreamerUpdate.MVVM.Model
         var dateName = _calendar.GetName(dt.Month, dt.Day);
         var serviceName = _serviceCalc.CalculateService();
         ServiceName = $"{dateName} - {serviceName}";
-        YoutubeHandler.Authenticate().ContinueWith(t =>
-        {
-          if (YoutubeHandler.Authenticated)
-          {
-            YoutubeHandler.KillPendingBroadcasts();
-          }
-
-        });
+        YoutubeHandler.Authenticate();
       });
     }
 
