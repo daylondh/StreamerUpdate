@@ -18,14 +18,11 @@ namespace StreamerUpdate
   {
     [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     public static extern bool DeleteObject(IntPtr hObject);
-
-    private readonly Calendar _calendar;
     private int _deviceIdx = -1;
     private IDisposable _timerDisposable;
     private ImageSource _capturedImage;
-    private CaptureDevice _captureDevice;
-    private IDisposable _fastCaptureDisposable;
-    private IObsRunner _obsRunner;
+    private readonly CaptureDevice _captureDevice;
+    private readonly IObsRunner _obsRunner;
     private bool _captureThreadShouldRun = true;
     public AudioInputMonitor InputMonitor { get; }
 

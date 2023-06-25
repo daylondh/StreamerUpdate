@@ -7,13 +7,14 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows;
 
 namespace StreamerUpdate
 {
   public class AudioInputMonitor : ReactiveObject, IDisposable
   {
-    private readonly IDisposable _disposableTimer;
+    private readonly Timer _disposableTimer;
 
 
     public AudioInputMonitor()
@@ -26,7 +27,8 @@ namespace StreamerUpdate
       {
         HasAudio = true;
       }
-      _disposableTimer = Observable.Interval(TimeSpan.FromMilliseconds(100)).Subscribe(_ => UpdateValues());
+
+      _disposableTimer = new Timer(state => UpdateValues(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
     }
 
     public ObservableCollection<MMDevice> Devices { get; } = new ObservableCollection<MMDevice>();

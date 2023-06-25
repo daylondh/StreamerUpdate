@@ -10,7 +10,7 @@ namespace StreamerUpdate.MVVM.Model
     {
         private Calendar _calendar;
 
-        public MainWindowModel(Calendar calendar, CalendarBuilder calendarBuilder, YoutubeHandler youtubeHandler)
+        public MainWindowModel(Calendar calendar, ServiceCalculator serviceCalc, CalendarBuilder calendarBuilder, YoutubeHandler youtubeHandler)
         {
             CameraState = CameraState.UNKNOWN;
             YoutubeHandler = youtubeHandler;
@@ -26,7 +26,9 @@ namespace StreamerUpdate.MVVM.Model
             var dt = DateTime.Now;
             calendarBuilder.Build(dt.Year);
             calendar.Print();
-            ServiceName = calendar.GetName(dt.Month, dt.Day);
+            var dateName = calendar.GetName(dt.Month, dt.Day);
+            var serviceName = serviceCalc.CalculateService();
+            ServiceName = $"{dateName} - {serviceName}";
         }
 
         [Reactive] 
