@@ -3,18 +3,23 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using StreamerUpdate.API;
 using StreamerUpdate.Camera;
+using StreamerUpdate.OBSInterop;
 
 namespace StreamerUpdate.MVVM.Model
 {
     public class MainWindowModel : ReactiveObject
     {
         private Calendar _calendar;
+        public  IObsRunner ObsRunner { get; }
 
-        public MainWindowModel(Calendar calendar, ServiceCalculator serviceCalc, CalendarBuilder calendarBuilder, YoutubeHandler youtubeHandler)
+        public MainWindowModel(Calendar calendar, ServiceCalculator serviceCalc, CalendarBuilder calendarBuilder,
+            YoutubeHandler youtubeHandler, IObsRunner obsRunner, AudioInputMonitor audioInputMonitor)
         {
+            InputMonitor = audioInputMonitor;
+            ObsRunner = obsRunner;
             CameraState = CameraState.UNKNOWN;
             YoutubeHandler = youtubeHandler;
-            YoutubeHandler.Authenticate().ContinueWith(t =>
+          /*  YoutubeHandler.Authenticate().ContinueWith(t =>
             {
                 if (YoutubeHandler.Authenticated)
                 {
@@ -22,6 +27,7 @@ namespace StreamerUpdate.MVVM.Model
                 }
 
             });
+            */
             _calendar = calendar;
             var dt = DateTime.Now;
             calendarBuilder.Build(dt.Year);
@@ -31,12 +37,23 @@ namespace StreamerUpdate.MVVM.Model
             ServiceName = $"{dateName} - {serviceName}";
         }
 
+        public void StartStreaming()
+        {
+            InputMonitor.BeQuiet();
+            ObsRunner.Go();
+        }
+
+        public void StopStreaming()
+        {
+            ObsRunner.Stop();
+        }
+
         [Reactive] 
         public CameraState CameraState { get; set; }
 
         [Reactive] 
         public string ServiceName { get; set; }
-
+        public AudioInputMonitor InputMonitor { get; }
         public YoutubeHandler YoutubeHandler { get; set; }
     }
 }

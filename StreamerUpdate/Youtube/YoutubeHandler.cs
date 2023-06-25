@@ -15,8 +15,7 @@ namespace StreamerUpdate.API
 {
     public class YoutubeHandler : ReactiveObject
     {
-        protected readonly string[] Scopes = {YouTubeService.Scope.Youtube};
-
+        private readonly string[] Scopes = {YouTubeService.Scope.Youtube};
         public YouTubeService? YoutubeService { get; private set; }
 
 
@@ -54,26 +53,46 @@ namespace StreamerUpdate.API
             foreach (var broadcast in broadcasts) YoutubeService.LiveBroadcasts.Delete(broadcast.Id).Execute();
         }
 
-        public ChurchStream MakeStream(string title)
+        /// <summary>
+        /// Makes a broadcast with the given snippet and status.
+        /// </summary>
+        /// <param name="snippet"></param>
+        /// <param name="status"></param>
+        /// <returns>The broadcast or null if there was an error.</returns>
+        public LiveBroadcast? MakeBroadcast(LiveBroadcastSnippet snippet, LiveBroadcastStatus status)
         {
-            var cs = new ChurchStream(title);
             var broadcast = new LiveBroadcast
             {
                 Kind = "youtube#liveBroadcast",
-                Snippet = new LiveBroadcastSnippet
+                Snippet = snippet,
+                Status = new LiveBroadcastStatus
                 {
-                    Title = title,
-                    ScheduledStartTime = DateTime.Now,
-                    ScheduledEndTime = DateTime.Now.AddHours(2)
-                },
-                Status = new LiveBroadcastStatus {PrivacyStatus = "public"}
+                    PrivacyStatus = "public"
+                }
             };
-            var insertRequest = YoutubeService.LiveBroadcasts.Insert(broadcast, "id,snippet,status");
-            var response = insertRequest.Execute();
-            cs.Broadcast = response;
-            YoutubeService.LiveBroadcasts.Bind(response.Id, "id,snippet,contentDetails,status").Execute();
-            return cs;
+            var insertRequest = YoutubeService?.LiveBroadcasts.Insert(broadcast, "id,snippet,status");
+            var response = insertRequest?.Execute();
+            return response;
+        }
+        
+        private List<LiveStream> GetStreams()
+        {
+            var listRequest = YoutubeService.LiveStreams.List("id");
+            listRequest.Mine = true;
+            var response = listRequest.Execute();
+            return response.Items.ToList();
+        }
+        
+        public bool BindBroadcast(LiveBroadcast broadcast, string tokenName)
+        {
+            // Find the stream
+            var streams = GetStreams();
+            foreach (var stream in streams)
+            {
+                var he=stream.Cdn;
+            }
 
+            return false;
         }
     }
 }

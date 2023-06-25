@@ -21,26 +21,35 @@ namespace StreamerUpdate
     private IDisposable _timerDisposable;
     private ImageSource _capturedImage;
     private readonly CaptureDevice _captureDevice;
-    private readonly IObsRunner _obsRunner;
-    private bool _captureThreadShouldRun = true;
-    public AudioInputMonitor InputMonitor { get; }
 
-    public MainWindowViewModel(MainWindowModel model, IObsRunner obsRunner)
+    private bool _captureThreadShouldRun = true;
+
+
+    public MainWindowViewModel(MainWindowModel model)
     {
       Model = model;
-      _obsRunner = obsRunner;
-      StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
+
+      StartStreamingCommand = ReactiveCommand.Create(StartStream);
       StopStreamingCommand = ReactiveCommand.Create(StopStream);
       _captureDevice = new CaptureDevice();
-      InputMonitor = new AudioInputMonitor();
+      
       Model.WhenPropertyChanged(m => m.ServiceName).Subscribe((t) => ServiceName = t.Value);
-      InputMonitor.WhenAnyValue(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
-      _obsRunner.WhenAnyValue(r => r.HasExited).Subscribe(_ => ReInit());
+      Model.InputMonitor.WhenAnyValue(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
+      Model.ObsRunner.WhenAnyValue(r => r.HasExited).Subscribe(_ => ReInit());
+    }
+
+    private void StartStream()
+    {
+      IsStreaming = true;
+      CanStream = false;
+      _captureThreadShouldRun = false;
+      Model.StartStreaming();
+
     }
 
     private void StopStream()
     {
-      _obsRunner.Stop();
+      Model.StopStreaming();
       ReInit();
     }
 
@@ -50,19 +59,19 @@ namespace StreamerUpdate
       CheckCanStream();
       if (CanStream)
         StartFastCapture();
-      InputMonitor.BeNoisy();
+      Model.InputMonitor.BeNoisy();
 
     }
 
     private void CheckCanStream()
     {
-      CanStream = CameraGood && InputMonitor.HasAudio;
+      CanStream = CameraGood && Model.InputMonitor.HasAudio;
     }
 
     public void Init()
     {
       ConnectDevice();
-      InputMonitor.BeNoisy();
+      Model.InputMonitor.BeNoisy();
       if (CameraBad)
         StartInterval();
       CheckCanStream();
@@ -127,16 +136,6 @@ namespace StreamerUpdate
         ConnectDevice();
       });
     }
-
-    private void OpenOBS()
-    {
-      IsStreaming = true;
-      CanStream = false;
-      _captureThreadShouldRun = false;
-      InputMonitor.BeQuiet();
-      _obsRunner.Go();
-    }
-
     [Reactive]
     public bool CameraBad { get; set; }
 

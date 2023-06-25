@@ -17,6 +17,7 @@ namespace StreamerUpdate
       Bind<MainWindowViewModel>().ToSelf().InSingletonScope();
       Bind<YoutubeHandler>().ToSelf().InSingletonScope();
       Bind<IObsRunner>().To<ObsRunner>().InSingletonScope();
+      Bind<AudioInputMonitor>().ToSelf().InSingletonScope();
     }
   }
 }
