@@ -37,7 +37,8 @@ namespace StreamerUpdate.OBSInterop
 
     public void Stop()
     {
-      _obsProcess.Close();
+      _obsProcess.CloseMainWindow();
+      HasExited = true;
     }
 
     [Reactive]

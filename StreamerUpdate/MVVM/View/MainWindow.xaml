@@ -10,8 +10,8 @@
   Title="Church Streamer"
   Width="800"
   Height="450"
-  Loaded="MainWindow_OnLoaded"
   Closing="MainWindow_OnClosing"
+  Loaded="MainWindow_OnLoaded"
   WindowState="Maximized"
   mc:Ignorable="d">
   <Grid>
@@ -41,7 +41,6 @@
       x:Name="StartStreamingButton"
       Grid.Column="1"
       Margin="5"
-      Click="StartStreamingClick"
       Command="{Binding StartStreamingCommand}"
       IsEnabled="{Binding CanStream}"
       Style="{StaticResource MahApps.Styles.Button.Square.Accent}">
@@ -121,6 +120,23 @@
 
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+        </Grid>
+        <Grid
+          Grid.ColumnSpan="2"
+          Background="{DynamicResource MahApps.Brushes.Window.Background}"
+          Visibility="{Binding IsStreaming, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <Viewbox>
+            <Button
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Background="DarkRed"
+              Command="{Binding StopStreamingCommand}"
+              Foreground="White">
+              <Viewbox>
+                <TextBlock Text="Stop Streaming" />
+              </Viewbox>
+            </Button>
+          </Viewbox>
         </Grid>
       </Grid>
     </Border>

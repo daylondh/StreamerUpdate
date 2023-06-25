@@ -6,7 +6,6 @@ using StreamerUpdate.OBSInterop;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -31,11 +30,28 @@ namespace StreamerUpdate
       Model = model;
       _obsRunner = obsRunner;
       StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
+      StopStreamingCommand = ReactiveCommand.Create(StopStream);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
       Model.WhenPropertyChanged(m => m.ServiceName).Subscribe((t) => ServiceName = t.Value);
       InputMonitor.WhenAnyValue(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
-      _obsRunner.WhenAnyValue(r => r.HasExited).Subscribe(_ => CheckCanStream());
+      _obsRunner.WhenAnyValue(r => r.HasExited).Subscribe(_ => ReInit());
+    }
+
+    private void StopStream()
+    {
+      _obsRunner.Stop();
+      ReInit();
+    }
+
+    private void ReInit()
+    {
+      IsStreaming = false;
+      CheckCanStream();
+      if (CanStream)
+        StartFastCapture();
+      InputMonitor.BeNoisy();
+
     }
 
     private void CheckCanStream()
@@ -46,6 +62,7 @@ namespace StreamerUpdate
     public void Init()
     {
       ConnectDevice();
+      InputMonitor.BeNoisy();
       if (CameraBad)
         StartInterval();
       CheckCanStream();
@@ -99,6 +116,7 @@ namespace StreamerUpdate
           CapturedImage = bs;
           DeleteObject(bmp);
         }
+        CapturedImage = null;
       }).Start();
     }
 
@@ -112,7 +130,10 @@ namespace StreamerUpdate
 
     private void OpenOBS()
     {
+      IsStreaming = true;
       CanStream = false;
+      _captureThreadShouldRun = false;
+      InputMonitor.BeQuiet();
       _obsRunner.Go();
     }
 
@@ -123,6 +144,8 @@ namespace StreamerUpdate
     public bool CameraGood { get; set; }
 
     public ICommand StartStreamingCommand { get; set; }
+
+    public ICommand StopStreamingCommand { get; set; }
 
     public ImageSource CapturedImage
     {
@@ -138,6 +161,9 @@ namespace StreamerUpdate
     public string ServiceName { get; set; }
 
     [Reactive] public bool CanStream { get; set; }
+
+    [Reactive]
+    public bool IsStreaming { get; set; }
 
 
     private MainWindowModel Model { get; set; }

@@ -6,7 +6,6 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 
@@ -14,7 +13,7 @@ namespace StreamerUpdate
 {
   public class AudioInputMonitor : ReactiveObject, IDisposable
   {
-    private readonly Timer _disposableTimer;
+    private Timer _disposableTimer;
 
 
     public AudioInputMonitor()
@@ -28,7 +27,7 @@ namespace StreamerUpdate
         HasAudio = true;
       }
 
-      _disposableTimer = new Timer(state => UpdateValues(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+
     }
 
     public ObservableCollection<MMDevice> Devices { get; } = new ObservableCollection<MMDevice>();
@@ -77,5 +76,19 @@ namespace StreamerUpdate
 
     [Reactive]
     public bool HasAudio { get; set; }
+
+    public void BeNoisy()
+    {
+      _disposableTimer = new Timer(state => UpdateValues(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+    }
+
+    public void BeQuiet()
+    {
+      for (var index = 0; index < Devices.Count; index++)
+      {
+        AudioInfos[index].Value = 0;
+      }
+      _disposableTimer.Dispose();
+    }
   }
 }

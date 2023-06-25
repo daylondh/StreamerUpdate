@@ -14,11 +14,6 @@ namespace StreamerUpdate
 
     }
 
-    private void StartStreamingClick(object sender, RoutedEventArgs e)
-    {
-      StartStreamingButton.IsEnabled = false;
-    }
-
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
       var vm = (DataContext as MainWindowViewModel);
