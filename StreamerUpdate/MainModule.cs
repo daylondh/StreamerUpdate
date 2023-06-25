@@ -1,8 +1,8 @@
 ﻿using Ninject.Modules;
-using System.Net.Http;
-using Google.Apis.YouTube.v3;
 using StreamerUpdate.API;
 using StreamerUpdate.MVVM.Model;
+using StreamerUpdate.OBSInterop;
+using System.Net.Http;
 
 namespace StreamerUpdate
 {
@@ -16,6 +16,7 @@ namespace StreamerUpdate
       Bind<CalendarBuilder>().ToSelf().InSingletonScope();
       Bind<MainWindowViewModel>().ToSelf().InSingletonScope();
       Bind<YoutubeHandler>().ToSelf().InSingletonScope();
+      Bind<IObsRunner>().To<ObsRunner>().InSingletonScope();
     }
   }
 }
