@@ -15,6 +15,7 @@ namespace StreamerUpdate.MVVM.Model
             CameraState = CameraState.UNKNOWN;
             YoutubeHandler = youtubeHandler;
             YoutubeHandler.Authenticate();
+            YoutubeHandler.KillPendingBroadcasts();
             _calendar = calendar;
             var dt = DateTime.Now;
             calendarBuilder.Build(dt.Year);

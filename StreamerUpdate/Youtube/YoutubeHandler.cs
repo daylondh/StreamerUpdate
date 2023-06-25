@@ -39,25 +39,18 @@ namespace StreamerUpdate.API
             if (YoutubeService != null) Authenticated = true;
         }
 
-        public List<LiveBroadcast> GetAllBroadcasts()
+        public List<LiveBroadcast> GetPendingBroadcasts()
         {
-            var listRequest = YoutubeService.LiveBroadcasts.List("snippet,contentDetails,status");
-            listRequest.BroadcastType = LiveBroadcastsResource.ListRequest.BroadcastTypeEnum.All;
-            listRequest.Mine = true;
+            var listRequest = YoutubeService.LiveBroadcasts.List("id");
+            listRequest.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.Upcoming;
             var response = listRequest.Execute();
             return response.Items.ToList();
         }
 
         public void KillPendingBroadcasts()
         {
-            var broadcasts = GetAllBroadcasts();
-            foreach (var broadcast in broadcasts)
-            {
-                var transitionRequest = YoutubeService.LiveBroadcasts.Transition(
-                    LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Complete, broadcast.Id, "status");
-                var response = transitionRequest.Execute();
-            }
+            var broadcasts = GetPendingBroadcasts();
+            foreach (var broadcast in broadcasts) YoutubeService.LiveBroadcasts.Delete(broadcast.Id).Execute();
         }
-        
     }
 }
