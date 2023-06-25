@@ -6,6 +6,7 @@ using StreamerUpdate.OBSInterop;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,6 +18,7 @@ namespace StreamerUpdate
   {
     [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     public static extern bool DeleteObject(IntPtr hObject);
+
     private int _deviceIdx = -1;
     private IDisposable _timerDisposable;
     private ImageSource _capturedImage;
@@ -70,11 +72,15 @@ namespace StreamerUpdate
 
     public void Init()
     {
-      ConnectDevice();
-      Model.InputMonitor.BeNoisy();
-      if (CameraBad)
-        StartInterval();
-      CheckCanStream();
+      Task.Run(() =>
+      {
+        Model.Init();
+        ConnectDevice();
+        Model.InputMonitor.BeNoisy();
+        if (CameraBad)
+          StartInterval();
+        CheckCanStream();
+      });
     }
 
     private void ConnectDevice()
@@ -165,7 +171,7 @@ namespace StreamerUpdate
     public bool IsStreaming { get; set; }
 
 
-    private MainWindowModel Model { get; set; }
+    public MainWindowModel Model { get; set; }
 
     public void Cleanup()
     {

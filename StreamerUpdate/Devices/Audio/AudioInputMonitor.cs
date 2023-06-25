@@ -15,23 +15,8 @@ namespace StreamerUpdate
   {
     private Timer _disposableTimer;
 
-
-    public AudioInputMonitor()
-    {
-      var enumerator = new MMDeviceEnumerator();
-      var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-      Devices.AddRange(devices);
-      AudioInfos = new ObservableCollection<AudioData>(new AudioData[Devices.Count]);
-      if (Devices.Count > 0)
-      {
-        HasAudio = true;
-      }
-
-
-    }
-
     public ObservableCollection<MMDevice> Devices { get; } = new ObservableCollection<MMDevice>();
-    public ObservableCollection<AudioData> AudioInfos { get; }
+    public ObservableCollection<AudioData> AudioInfos { get; set; }
 
     public void Dispose()
     {
@@ -79,6 +64,18 @@ namespace StreamerUpdate
 
     public void BeNoisy()
     {
+      if (AudioInfos == null)
+      {
+        var enumerator = new MMDeviceEnumerator();
+        var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+        Devices.AddRange(devices);
+        AudioInfos = new ObservableCollection<AudioData>(new AudioData[Devices.Count]);
+        if (Devices.Count > 0)
+        {
+          HasAudio = true;
+        }
+      }
+
       _disposableTimer = new Timer(state => UpdateValues(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
     }
 

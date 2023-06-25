@@ -97,7 +97,7 @@
             Text="Camera OK!" />
         </Grid>
         <Grid Grid.Column="1">
-          <ItemsControl Margin="10" ItemsSource="{Binding InputMonitor.AudioInfos}">
+          <ItemsControl Margin="10" ItemsSource="{Binding Model.InputMonitor.AudioInfos}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
                 <Grid>
