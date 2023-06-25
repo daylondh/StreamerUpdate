@@ -24,7 +24,7 @@ namespace StreamerUpdate
     public MainWindowViewModel(MainWindowModel model)
     {
       Model = model;
-
+      Model.YoutubeHandler.WhenPropertyChanged(v => v.Authenticated).Subscribe(v => Authenticated = v.Value);
       StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
@@ -137,6 +137,8 @@ namespace StreamerUpdate
     [Reactive] public bool CanStream { get; set; }
 
 
+    [Reactive] 
+    public bool Authenticated { get; set; }
     private MainWindowModel Model { get; set; }
   }
 }
