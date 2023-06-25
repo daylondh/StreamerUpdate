@@ -5,20 +5,28 @@ using StreamerUpdate.MVVM.Model;
 using StreamerUpdate.OBSInterop;
 using System;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace StreamerUpdate
 {
   public class MainWindowViewModel : ReactiveObject
   {
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
+
     private readonly Calendar _calendar;
     private int _deviceIdx = -1;
     private IDisposable _timerDisposable;
-    private BitmapImage _capturedImage;
+    private ImageSource _capturedImage;
     private CaptureDevice _captureDevice;
     private IDisposable _fastCaptureDisposable;
     private IObsRunner _obsRunner;
+    private bool _captureThreadShouldRun = true;
     public AudioInputMonitor InputMonitor { get; }
 
     public MainWindowViewModel(MainWindowModel model, IObsRunner obsRunner)
@@ -56,54 +64,53 @@ namespace StreamerUpdate
         CameraBad = true;
         return;
       }
-      for (var index = 0; index < devices.Count; index++)
+      var img = _captureDevice.Capture(0);
+      if (img == null)
       {
-        var img = _captureDevice.Capture(index);
-        if (img == null)
-        {
-          continue;
-        }
-        _timerDisposable?.Dispose();
-        _deviceIdx = index;
-        CapturedImage = img;
-        CameraGood = true;
-        CameraBad = false;
-        StartFastCapture();
         return;
       }
-      CameraGood = false;
-      CameraBad = true;
-      CheckCanStream();
+      _timerDisposable?.Dispose();
+      _deviceIdx = 0;
+      BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+        img.GetHbitmap(),
+        IntPtr.Zero,
+        Int32Rect.Empty,
+        BitmapSizeOptions.FromEmptyOptions());
+      bs.Freeze();
+      CapturedImage = bs;
+      CameraGood = true;
+      CameraBad = false;
+      StartFastCapture();
     }
 
     private void StartFastCapture()
     {
-      bool busy = false;
-      _fastCaptureDisposable = Observable.Interval(TimeSpan.FromMilliseconds(500)).Subscribe(
-        t =>
+      _captureThreadShouldRun = true;
+      new Thread(() =>
+      {
+        while (_captureThreadShouldRun)
         {
-          if (busy)
-            return;
-          busy = true;
+          Thread.Sleep(42);
           var imag = _captureDevice.Capture(_deviceIdx);
-          if (imag == null)
-          {
-            CameraGood = false;
-            CameraBad = true;
-            StartInterval();
-            _fastCaptureDisposable.Dispose();
-            busy = false;
-            return;
-          }
-
-          CapturedImage = imag;
-          busy = false;
-        });
+          var bmp = imag.GetHbitmap();
+          BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+            bmp,
+            IntPtr.Zero,
+            Int32Rect.Empty,
+            BitmapSizeOptions.FromEmptyOptions());
+          bs.Freeze();
+          CapturedImage = bs;
+          DeleteObject(bmp);
+        }
+      }).Start();
     }
 
     private void StartInterval()
     {
-      _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(t => ConnectDevice());
+      _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(t =>
+      {
+        ConnectDevice();
+      });
     }
 
     private void OpenOBS()
@@ -120,11 +127,14 @@ namespace StreamerUpdate
 
     public ICommand StartStreamingCommand { get; set; }
 
-
-    public BitmapImage CapturedImage
+    public ImageSource CapturedImage
     {
       get => _capturedImage;
-      set => this.RaiseAndSetIfChanged(ref _capturedImage, value);
+      set
+      {
+        _capturedImage = value;
+        this.RaisePropertyChanged();
+      }
     }
 
     [Reactive]
@@ -134,5 +144,10 @@ namespace StreamerUpdate
 
 
     private MainWindowModel Model { get; set; }
+
+    public void Cleanup()
+    {
+      _captureThreadShouldRun = false;
+    }
   }
 }
