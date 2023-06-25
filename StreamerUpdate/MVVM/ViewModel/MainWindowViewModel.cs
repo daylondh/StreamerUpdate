@@ -1,14 +1,12 @@
-﻿using ReactiveUI;
+﻿using DynamicData.Binding;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using StreamerUpdate.AppContainer;
+using StreamerUpdate.MVVM.Model;
 using System;
-using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using DynamicData.Binding;
-using StreamerUpdate.Camera;
-using StreamerUpdate.MVVM.Model;
 
 namespace StreamerUpdate
 {
@@ -26,20 +24,25 @@ namespace StreamerUpdate
     public MainWindowViewModel(MainWindowModel model)
     {
       Model = model;
-     
+
       StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
-   
-      InitModelListeners();
-      ConnectDevice(); // Culprit
-      if (CameraBad)
-        StartInterval();
+      Model.WhenPropertyChanged(m => m.ServiceName).Subscribe((t) => ServiceName = t.Value);
+      InputMonitor.WhenPropertyChanged(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
     }
 
-    private void InitModelListeners()
+    private void CheckCanStream()
     {
-      Model.WhenPropertyChanged(model => model.ServiceName).Subscribe((t) => ServiceName = t.Value);
+      CanStream = CameraGood && InputMonitor.HasAudio;
+    }
+
+    public void Init()
+    {
+      ConnectDevice();
+      if (CameraBad)
+        StartInterval();
+      CheckCanStream();
     }
 
     private void ConnectDevice()
@@ -69,6 +72,7 @@ namespace StreamerUpdate
       }
       CameraGood = false;
       CameraBad = true;
+      CheckCanStream();
     }
 
     private void StartFastCapture()
@@ -100,13 +104,13 @@ namespace StreamerUpdate
     {
       _timerDisposable = Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(t => ConnectDevice());
     }
-    
+
     private void OpenOBS()
     {
       AppControlItem.ExeName = @"C:\Program Files\obs-studio\bin\64bit\obs64.exe";
       AppControlItem.Go();
     }
-    
+
     [Reactive]
     public bool CameraBad { get; set; }
 
@@ -129,8 +133,10 @@ namespace StreamerUpdate
 
     [Reactive]
     public string ServiceName { get; set; }
-    
-    
+
+    [Reactive] public bool CanStream { get; set; }
+
+
     private MainWindowModel Model { get; set; }
   }
 }
