@@ -17,12 +17,7 @@ namespace StreamerUpdate
       ConfigureContainer();
       ComposeObjects();
       Current.MainWindow.Show();
-     
-      YoutubeHandler handler = new YoutubeHandler();
-      handler.authenticate().ContinueWith(task =>
-      {
-        handler.listBroadcasts();
-      });
+      
     }
 
     private void ConfigureContainer()
