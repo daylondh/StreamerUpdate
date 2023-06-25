@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
 
 namespace StreamerUpdate
 {
@@ -19,17 +18,10 @@ namespace StreamerUpdate
       StartStreamingButton.IsEnabled = false;
     }
 
-    private void MainWindow_OnClosing(object sender, CancelEventArgs e)
-    {
-      _appControl.Cleanup();
-    }
-
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
       var vm = (DataContext as MainWindowViewModel);
-      vm.AppControlItem = _appControl;
       vm.Init();
-      this.Unloaded += (s, e) => { _appControl.Dispose(); };
     }
   }
 }

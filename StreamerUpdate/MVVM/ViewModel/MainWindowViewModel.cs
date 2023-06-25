@@ -1,8 +1,8 @@
 ﻿using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using StreamerUpdate.AppContainer;
 using StreamerUpdate.MVVM.Model;
+using StreamerUpdate.OBSInterop;
 using System;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -13,23 +13,24 @@ namespace StreamerUpdate
   public class MainWindowViewModel : ReactiveObject
   {
     private readonly Calendar _calendar;
-    private AppControl _appControlItem;
     private int _deviceIdx = -1;
     private IDisposable _timerDisposable;
     private BitmapImage _capturedImage;
     private CaptureDevice _captureDevice;
     private IDisposable _fastCaptureDisposable;
+    private IObsRunner _obsRunner;
     public AudioInputMonitor InputMonitor { get; }
 
-    public MainWindowViewModel(MainWindowModel model)
+    public MainWindowViewModel(MainWindowModel model, IObsRunner obsRunner)
     {
       Model = model;
-      Model.YoutubeHandler.WhenPropertyChanged(v => v.Authenticated).Subscribe(v => Authenticated = v.Value);
+      _obsRunner = obsRunner;
       StartStreamingCommand = ReactiveCommand.Create(OpenOBS);
       _captureDevice = new CaptureDevice();
       InputMonitor = new AudioInputMonitor();
       Model.WhenPropertyChanged(m => m.ServiceName).Subscribe((t) => ServiceName = t.Value);
-      InputMonitor.WhenPropertyChanged(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
+      InputMonitor.WhenAnyValue(mo => mo.HasAudio).Subscribe(_ => CheckCanStream());
+      _obsRunner.WhenAnyValue(r => r.HasExited).Subscribe(_ => CheckCanStream());
     }
 
     private void CheckCanStream()
@@ -107,8 +108,8 @@ namespace StreamerUpdate
 
     private void OpenOBS()
     {
-      AppControlItem.ExeName = @"C:\Program Files\obs-studio\bin\64bit\obs64.exe";
-      AppControlItem.Go();
+      CanStream = false;
+      _obsRunner.Go();
     }
 
     [Reactive]
@@ -119,11 +120,6 @@ namespace StreamerUpdate
 
     public ICommand StartStreamingCommand { get; set; }
 
-    public AppControl AppControlItem
-    {
-      get => _appControlItem;
-      set => _appControlItem = value;
-    }
 
     public BitmapImage CapturedImage
     {
@@ -137,8 +133,6 @@ namespace StreamerUpdate
     [Reactive] public bool CanStream { get; set; }
 
 
-    [Reactive] 
-    public bool Authenticated { get; set; }
     private MainWindowModel Model { get; set; }
   }
 }
