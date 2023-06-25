@@ -11,6 +11,7 @@
   Width="800"
   Height="450"
   Loaded="MainWindow_OnLoaded"
+  Closing="MainWindow_OnClosing"
   WindowState="Maximized"
   mc:Ignorable="d">
   <Grid>

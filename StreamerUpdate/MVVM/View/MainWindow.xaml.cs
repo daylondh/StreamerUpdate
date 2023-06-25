@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace StreamerUpdate
 {
@@ -22,6 +23,11 @@ namespace StreamerUpdate
     {
       var vm = (DataContext as MainWindowViewModel);
       vm.Init();
+    }
+
+    private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+    {
+      (DataContext as MainWindowViewModel).Cleanup();
     }
   }
 }
